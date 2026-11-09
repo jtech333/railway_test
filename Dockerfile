@@ -1,22 +1,25 @@
 FROM node:20-slim
 
 # Install system dependencies required for Chrome and PDF rendering
-RUN apt-get update || true && apt-get install -y \
-
-
-    wget \
-    gnupg \
-    libnss3 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxrandr2 \
-    libgbm1 \
-    libpango-1.0-0 \
-    libjpeg-turbo8 \
-    libpng16-16 \
+RUN echo "deb http://deb.debian.org/debian bookworm main" > /etc/apt/sources.list && \
+    echo "deb http://security.debian.org/debian-security bookworm-security main" >> /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        wget \
+        gnupg \
+        libnss3 \
+        libatk1.0-0 \
+        libatk-bridge2.0-0 \
+        libcups2 \
+        libxcomposite1 \
+        libxdamage1 \
+        libxrandr2 \
+        libgbm1 \
+        libpango-1.0-0 \
+        libjpeg62-turbo \
+        libpng16-16 \
+        fonts-liberation \
+        fonts-noto-cjk \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Google Chrome
