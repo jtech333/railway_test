@@ -1,7 +1,9 @@
 FROM node:20-slim
 
 # Install system dependencies required for Chrome and PDF rendering
-RUN apt-get update && apt-get install -y \
+RUN apt-get update || true && apt-get install -y \
+
+
     wget \
     gnupg \
     libnss3 \
