@@ -2,48 +2,53 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 
-// Path to a sample image (create one or use any local PNG/JPG)
-// For testing, we'll create a simple canvas-based image programmatically
 async function createTestImage() {
   const browser = await puppeteer.launch({
-  executablePath: '/usr/bin/google-chrome-stable', // Point to the system install
-  args: [
-    '--no-sandbox', // Required if running as root in Docker/Railway
-    '--disable-setuid-sandbox',
-    '--disable-dev-shm-usage' // Prevents crashes from low memory
-  ]
-});
-  
-  // Generate a dummy PDF to prove HTML rendering works
-  await page.pdf({ 
-    path: './test-report.pdf', 
-    format: 'A4',
-    printBackground: true 
-  });
-  console.log('✅ HTML-to-PDF rendered successfully: ./test-report.pdf');
-
-  // Now test Image decoding/rendering
-  // We will draw an image onto a canvas and save it as a new image to prove decode works
-  await page.goto('about:blank');
-  await page.evaluate(() => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 800;
-    canvas.height = 600;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f0f0f0';
-    ctx.fillRect(0, 0, 800, 600);
-    ctx.fillStyle = '#000000';
-    ctx.font = '30px Arial';
-    ctx.fillText('Evidence Photo Rendered Successfully', 50, 100);
-    return canvas.toDataURL('image/png');
-  }).then(dataUrl => {
-    // Write the data URL to a file to verify it's valid
-    const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
-    fs.writeFileSync('./test-evidence.png', Buffer.from(base64Data, 'base64'));
-    console.log('✅ Image decoding/rendering successful: ./test-evidence.png');
+    executablePath: '/usr/bin/google-chrome-stable',
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage'
+    ]
   });
 
-  await browser.close();
+  // FIX: Create the page object here
+  const page = await browser.newPage();
+
+  try {
+    // Generate a dummy PDF to prove HTML rendering works
+    await page.pdf({ 
+      path: './test-report.pdf', 
+      format: 'A4',
+      printBackground: true 
+    });
+    console.log('✅ HTML-to-PDF rendered successfully: ./test-report.pdf');
+
+    // Now test Image decoding/rendering
+    await page.goto('about:blank');
+    await page.evaluate(() => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 800;
+      canvas.height = 600;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#f0f0f0';
+      ctx.fillRect(0, 0, 800, 600);
+      ctx.fillStyle = '#000000';
+      ctx.font = '30px Arial';
+      ctx.fillText('Evidence Photo Rendered Successfully', 50, 100);
+      return canvas.toDataURL('image/png');
+    }).then(dataUrl => {
+      const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
+      fs.writeFileSync('./test-evidence.png', Buffer.from(base64Data, 'base64'));
+      console.log('✅ Image decoding/rendering successful: ./test-evidence.png');
+    });
+    
+  } catch (error) {
+    console.error("❌ Page execution error:", error);
+    throw error;
+  } finally {
+    await browser.close();
+  }
 }
 
 (async () => {
