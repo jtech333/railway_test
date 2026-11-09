@@ -5,9 +5,14 @@ const path = require('path');
 // Path to a sample image (create one or use any local PNG/JPG)
 // For testing, we'll create a simple canvas-based image programmatically
 async function createTestImage() {
-  const browser = await puppeteer.launch({ headless: 'new' });
-  const page = await browser.newPage();
-  await page.setContent('<html><body style="background-color:white; color:black; font-family:sans-serif;"><h1>Evidence Photo Test</h1><p>This is a test image.</p></body></html>');
+  const browser = await puppeteer.launch({
+  executablePath: '/usr/bin/google-chrome-stable', // Point to the system install
+  args: [
+    '--no-sandbox', // Required if running as root in Docker/Railway
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage' // Prevents crashes from low memory
+  ]
+});
   
   // Generate a dummy PDF to prove HTML rendering works
   await page.pdf({ 

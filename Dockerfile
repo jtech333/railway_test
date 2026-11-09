@@ -48,6 +48,13 @@ COPY . .
 
 # Expose port if your app serves HTTP (change 3000 to your actual port)
 EXPOSE 3000
+# ... [previous steps installing dependencies and chrome] ...
 
-# Command to start your app (adjust 'your-entrypoint.js' to your main file name)
+# Tell Puppeteer where to find the system Chrome
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+
+# Expose port (if your server listens on one)
+EXPOSE 8080
+
+# Start your app
 CMD ["node", "test-render.js"]
