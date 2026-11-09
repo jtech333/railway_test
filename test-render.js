@@ -1,22 +1,23 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
-const path = require('path');
 
 async function createTestImage() {
+  // STRICT MODE: No --no-sandbox
   const browser = await puppeteer.launch({
     executablePath: '/usr/bin/google-chrome-stable',
     args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
+      '--disable-setuid-sandbox', // Often still needed on Linux even without --no-sandbox if user isn't root
       '--disable-dev-shm-usage'
+      // Note: We are NOT passing --no-sandbox here
     ]
   });
 
-  // FIX: Create the page object here
   const page = await browser.newPage();
 
   try {
-    // Generate a dummy PDF to prove HTML rendering works
+    console.log('🚀 Starting Strict Sandbox Validation...');
+    
+    // Test PDF
     await page.pdf({ 
       path: './test-report.pdf', 
       format: 'A4',
@@ -24,7 +25,7 @@ async function createTestImage() {
     });
     console.log('✅ HTML-to-PDF rendered successfully: ./test-report.pdf');
 
-    // Now test Image decoding/rendering
+    // Test Image
     await page.goto('about:blank');
     await page.evaluate(() => {
       const canvas = document.createElement('canvas');
@@ -43,8 +44,10 @@ async function createTestImage() {
       console.log('✅ Image decoding/rendering successful: ./test-evidence.png');
     });
     
+    console.log('🎉 Strict Sandbox Validation Passed!');
+
   } catch (error) {
-    console.error("❌ Page execution error:", error);
+    console.error('❌ Strict Sandbox Validation Failed:', error.message);
     throw error;
   } finally {
     await browser.close();
@@ -53,11 +56,8 @@ async function createTestImage() {
 
 (async () => {
   try {
-    console.log('🚀 Starting Puppeteer Validation...');
     await createTestImage();
-    console.log('🎉 All validations passed! Your configuration is ready for deployment.');
   } catch (error) {
-    console.error('❌ Validation failed:', error);
     process.exit(1);
   }
 })();
