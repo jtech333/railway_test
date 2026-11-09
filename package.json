@@ -1,0 +1,17 @@
+{
+  "name": "puppeteer_chrome_test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test-render.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "dependencies": {
+    "puppeteer": "^25.16.0"
+  },
+  "allowScripts": {
+    "puppeteer@25.16.0": true
+  }
+}
