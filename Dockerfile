@@ -22,12 +22,18 @@ RUN echo "deb http://deb.debian.org/debian bookworm main" > /etc/apt/sources.lis
         fonts-noto-cjk \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Google Chrome
-RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable \
+# Install prerequisites for downloading chrome
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    gnupg \
     && rm -rf /var/lib/apt/lists/*
+
+# Download and install Google Chrome Stable
+RUN curl -fsSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o /tmp/google-chrome.deb && \
+    apt-get update && \
+    apt-get install -y /tmp/google-chrome.deb && \
+    rm /tmp/google-chrome.deb
 
 WORKDIR /app
 
